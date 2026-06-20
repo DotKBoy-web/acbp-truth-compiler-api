@@ -1,0 +1,320 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ACBP Truth Compiler API</title>
+  <meta name="description" content="Compile categories, dashboard states, workflow logic, and declared truths into auditable truth-space artifacts." />
+  <style>
+    :root {
+      --bg: #070a12;
+      --card: #101827;
+      --card2: #0d1320;
+      --text: #eef4ff;
+      --muted: #9fb0c8;
+      --line: #243047;
+      --accent: #65d6ff;
+      --accent2: #8cffc1;
+      --danger: #ffcc66;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Segoe UI, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(101,214,255,.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(140,255,193,.12), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: .4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 8px 12px;
+      border: 1px solid rgba(101,214,255,.35);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(101,214,255,.08);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero {
+      padding: 86px 0 60px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 78px);
+      line-height: .98;
+      letter-spacing: -2.8px;
+      margin: 18px 0;
+      max-width: 980px;
+    }
+
+    .lead {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 30px 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #041018;
+      border: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 36px 0;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .card p, .card li {
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 48px 0;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -1.4px;
+      margin: 0 0 18px;
+    }
+
+    pre {
+      overflow: auto;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: #050812;
+      color: #d9f7ff;
+      font-size: 13px;
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .price {
+      font-size: 30px;
+      font-weight: 900;
+      margin: 8px 0;
+    }
+
+    .truth {
+      border-left: 4px solid var(--danger);
+    }
+
+    footer {
+      padding: 40px 0 60px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .grid, .pricing { grid-template-columns: 1fr; }
+      nav { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">ACBP Truth Compiler API</div>
+        <div>
+          <a class="btn" href="openapi.json">OpenAPI JSON</a>
+          <a class="btn primary" href="mailto:YOUR_EMAIL_HERE?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request API Key</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <span class="badge">v0.1.0 public API release</span>
+        <h1>Expose the hidden truth structure behind dashboards, categories, and workflow states.</h1>
+        <p class="lead">
+          ACBP Truth Compiler API compiles declared categories, flags, dashboard states,
+          workflow rules, and structured outputs into auditable truth-space artifacts.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" href="mailto:YOUR_EMAIL_HERE?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request Early Access</a>
+          <a class="btn" href="openapi.json">View OpenAPI</a>
+          <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">GitHub Repo</a>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Truth-space compile</h3>
+            <p>Calculate truth-space size, declared valid states, derived invalid states, and truth density.</p>
+          </div>
+          <div class="card">
+            <h3>Feature compactness</h3>
+            <p>Recommend compact categorical feature sets before dashboards, models, and AI agents explode in state-space size.</p>
+          </div>
+          <div class="card">
+            <h3>Dashboard equivalence</h3>
+            <p>Compare Live SQL outputs against compiled-state outputs to detect semantic drift and dashboard inconsistency.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Core API Endpoints</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>POST /v1/truth-space/compile</h3>
+            <p>Compile declared truth specs and return auditable truth-space metrics.</p>
+          </div>
+          <div class="card">
+            <h3>POST /v1/features/compact</h3>
+            <p>Screen column metadata or records and recommend compact truth dimensions.</p>
+          </div>
+          <div class="card">
+            <h3>POST /v1/dashboard/compare</h3>
+            <p>Compare Live SQL and compiled-state result sets for semantic equivalence.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Example Payload</h2>
+        <pre>{
+  "name": "object_color",
+  "dimensions": [
+    { "name": "TargetClass", "values": ["Apple", "Banana", "Mango"] },
+    { "name": "Color", "values": ["Red", "Yellow", "Green"] }
+  ],
+  "declared_truths": [
+    { "TargetClass": "Apple", "Color": "Red" },
+    { "TargetClass": "Apple", "Color": "Green" },
+    { "TargetClass": "Banana", "Color": "Yellow" },
+    { "TargetClass": "Banana", "Color": "Green" },
+    { "TargetClass": "Mango", "Color": "Red" },
+    { "TargetClass": "Mango", "Color": "Yellow" }
+  ]
+}</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Suggested Pricing</h2>
+        <div class="pricing">
+          <div class="card">
+            <h3>Free</h3>
+            <div class="price">$0</div>
+            <p>25 compiles/month<br>Max truth space: 10,000</p>
+          </div>
+          <div class="card">
+            <h3>Starter</h3>
+            <div class="price">$9</div>
+            <p>500 compiles/month<br>Max truth space: 100,000</p>
+          </div>
+          <div class="card">
+            <h3>Builder</h3>
+            <div class="price">$29</div>
+            <p>3,000 compiles/month<br>Max truth space: 1,000,000</p>
+          </div>
+          <div class="card">
+            <h3>Pro</h3>
+            <div class="price">$79</div>
+            <p>15,000 compiles/month<br>Max truth space: 10,000,000</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card truth">
+          <h2>Guardrails</h2>
+          <p>Truth space is not a confusion matrix.</p>
+          <p>Declared valid count is not prediction correctness.</p>
+          <p>Derived invalid count is not model error.</p>
+          <p>ACBP is for declared-truth modeling, dashboard logic validation, categorical-state reasoning, and operational state validation.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      ACBP Truth Compiler API — Truth must be declared.
+    </div>
+  </footer>
+</body>
+</html>
