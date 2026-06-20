@@ -357,3 +357,12 @@ def project_detail(
         return product_service.get_project(project_id)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Project not found.") from exc
+
+# --- ACBP cloud marketplace security ---
+try:
+    from Apps.CompilerAPI.security import install_marketplace_security
+except ModuleNotFoundError:
+    from security import install_marketplace_security
+
+install_marketplace_security(app)
+# --- end ACBP cloud marketplace security ---
