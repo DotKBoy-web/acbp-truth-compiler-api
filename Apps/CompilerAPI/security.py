@@ -11,6 +11,7 @@ PUBLIC_PATHS = {
     "/openapi.json",
     "/docs",
     "/redoc",
+    "/favicon.ico",
 }
 
 
@@ -99,3 +100,4 @@ def install_marketplace_security(app):
         _inject_internal_api_key(request)
 
         return await call_next(request)
+

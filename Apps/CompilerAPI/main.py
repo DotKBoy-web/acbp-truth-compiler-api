@@ -405,3 +405,24 @@ def export_project_v1(project_id: str):
 def export_project_legacy_api(project_id: str):
     return _export_project_zip_response(project_id)
 # --- end ACBP public and legacy export routes ---
+
+# --- ACBP cloud root route ---
+from fastapi.responses import PlainTextResponse
+
+@app.get("/")
+def cloud_root():
+    return {
+        "service": "ACBP Truth Compiler API",
+        "version": "0.1.0",
+        "status": "live",
+        "health": "/v1/health",
+        "openapi": "/openapi.json",
+        "docs": "/docs",
+        "market_position": "declared-truth compiler for dashboards, categories, and workflow states",
+        "contact": "dotkboy@outlook.com",
+    }
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return PlainTextResponse("", status_code=204)
+# --- end ACBP cloud root route ---
