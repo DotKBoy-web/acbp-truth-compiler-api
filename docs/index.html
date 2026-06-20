@@ -3,155 +3,299 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ACBP Truth Compiler API</title>
-  <meta name="description" content="Compile categories, dashboard states, workflow logic, and declared truths into auditable truth-space artifacts." />
+  <title>ACBP Truth Compiler API | Declared-Truth Modeling for Dashboards and Workflow States</title>
+  <meta name="description" content="ACBP Truth Compiler API compiles categories, dashboard states, workflow logic, and declared truths into auditable truth-space artifacts." />
+
   <style>
     :root {
-      --bg: #070a12;
-      --card: #101827;
-      --card2: #0d1320;
-      --text: #eef4ff;
-      --muted: #9fb0c8;
-      --line: #243047;
-      --accent: #65d6ff;
-      --accent2: #8cffc1;
-      --danger: #ffcc66;
+      --bg: #07101f;
+      --bg2: #0b1220;
+      --panel: rgba(255,255,255,.055);
+      --panel2: rgba(255,255,255,.035);
+      --text: #eef5ff;
+      --muted: #a9b7cc;
+      --soft: #d7e7ff;
+      --line: rgba(255,255,255,.12);
+      --accent: #61dafb;
+      --accent2: #9dffca;
+      --gold: #ffcf70;
+      --danger: #ff8a8a;
+      --shadow: 0 24px 80px rgba(0,0,0,.35);
     }
 
     * { box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      font-family: Segoe UI, Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(101,214,255,.18), transparent 34%),
-        radial-gradient(circle at top right, rgba(140,255,193,.12), transparent 30%),
-        var(--bg);
+        radial-gradient(circle at 15% 5%, rgba(97,218,251,.22), transparent 30%),
+        radial-gradient(circle at 85% 0%, rgba(157,255,202,.14), transparent 28%),
+        linear-gradient(180deg, #050a14 0%, var(--bg) 45%, #050a14 100%);
       color: var(--text);
-      line-height: 1.55;
+      line-height: 1.6;
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: inherit; text-decoration: none; }
 
     .wrap {
-      width: min(1120px, calc(100% - 40px));
+      width: min(1160px, calc(100% - 42px));
       margin: 0 auto;
     }
 
     header {
-      padding: 28px 0;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(5,10,20,.76);
+      border-bottom: 1px solid var(--line);
     }
 
     nav {
+      min-height: 76px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 18px;
     }
 
     .brand {
-      font-weight: 800;
-      letter-spacing: .4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .badge {
+    .brand strong {
+      font-size: 17px;
+      letter-spacing: .2px;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
       display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 8px 12px;
-      border: 1px solid rgba(101,214,255,.35);
+      border: 1px solid rgba(97,218,251,.35);
       border-radius: 999px;
       color: var(--accent);
-      background: rgba(101,214,255,.08);
+      background: rgba(97,218,251,.08);
       font-size: 13px;
       font-weight: 700;
-    }
-
-    .hero {
-      padding: 86px 0 60px;
-    }
-
-    h1 {
-      font-size: clamp(40px, 7vw, 78px);
-      line-height: .98;
-      letter-spacing: -2.8px;
-      margin: 18px 0;
-      max-width: 980px;
-    }
-
-    .lead {
-      max-width: 780px;
-      color: var(--muted);
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    .cta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin: 30px 0;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 14px 18px;
-      border-radius: 14px;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 13px;
       border: 1px solid var(--line);
-      background: var(--card);
+      background: rgba(255,255,255,.06);
       color: var(--text);
       font-weight: 800;
+      transition: .18s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.1);
     }
 
     .btn.primary {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #041018;
       border: none;
+      box-shadow: 0 12px 40px rgba(97,218,251,.18);
     }
 
-    .grid {
+    .hero {
+      padding: 96px 0 72px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.18fr .82fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: .98;
+      letter-spacing: -2.8px;
+      margin: 18px 0 20px;
+      max-width: 900px;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 20px;
+      margin: 0 0 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 32px 0 26px;
+    }
+
+    .micro {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .terminal {
+      background: #040813;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .dots {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+    }
+
+    pre {
+      margin: 0;
+      color: #dff8ff;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .metric {
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      border-radius: 18px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      color: var(--soft);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    section {
+      padding: 58px 0;
+    }
+
+    h2 {
+      font-size: clamp(30px, 4.3vw, 48px);
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin: 0 0 14px;
+    }
+
+    .section-lead {
+      color: var(--muted);
+      max-width: 760px;
+      font-size: 18px;
+      margin: 0 0 28px;
+    }
+
+    .grid3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
-      margin: 36px 0;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.2);
     }
 
     .card h3 {
-      margin-top: 0;
-      font-size: 18px;
+      margin: 0 0 10px;
+      font-size: 19px;
     }
 
     .card p, .card li {
       color: var(--muted);
     }
 
-    .section {
-      padding: 48px 0;
+    .card ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
     }
 
-    h2 {
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing: -1.4px;
-      margin: 0 0 18px;
+    .tag {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(157,255,202,.09);
+      color: var(--accent2);
+      border: 1px solid rgba(157,255,202,.22);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
     }
 
-    pre {
-      overflow: auto;
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.1);
-      background: #050812;
-      color: #d9f7ff;
-      font-size: 13px;
+    .endpoint {
+      color: var(--accent);
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      font-weight: 800;
     }
 
     .pricing {
@@ -161,36 +305,79 @@
     }
 
     .price {
-      font-size: 30px;
-      font-weight: 900;
-      margin: 8px 0;
+      font-size: 34px;
+      font-weight: 950;
+      margin: 6px 0 8px;
+      letter-spacing: -1px;
     }
 
-    .truth {
-      border-left: 4px solid var(--danger);
+    .price small {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .highlight {
+      border-color: rgba(97,218,251,.45);
+      background: linear-gradient(180deg, rgba(97,218,251,.09), rgba(255,255,255,.035));
+    }
+
+    .guardrail {
+      border-left: 5px solid var(--gold);
+    }
+
+    .contact {
+      background:
+        radial-gradient(circle at top right, rgba(97,218,251,.13), transparent 30%),
+        linear-gradient(180deg, var(--panel), var(--panel2));
     }
 
     footer {
-      padding: 40px 0 60px;
+      padding: 38px 0 58px;
       color: var(--muted);
-      border-top: 1px solid rgba(255,255,255,.08);
-      margin-top: 40px;
+      border-top: 1px solid var(--line);
+      margin-top: 30px;
     }
 
-    @media (max-width: 900px) {
-      .grid, .pricing { grid-template-columns: 1fr; }
-      nav { align-items: flex-start; flex-direction: column; }
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 940px) {
+      .hero-grid, .grid3, .grid2, .pricing, .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px 0;
+      }
+
+      .hero {
+        padding-top: 60px;
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
       <nav>
-        <div class="brand">ACBP Truth Compiler API</div>
-        <div>
-          <a class="btn" href="openapi.json">OpenAPI JSON</a>
-          <a class="btn primary" href="mailto:YOUR_EMAIL_HERE?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request API Key</a>
+        <a class="brand" href="#">
+          <strong>ACBP Truth Compiler API</strong>
+          <span>Declared-truth modeling for structured systems</span>
+        </a>
+
+        <div class="navlinks">
+          <a class="btn" href="#endpoints">Endpoints</a>
+          <a class="btn" href="#pricing">Pricing</a>
+          <a class="btn" href="openapi.json">OpenAPI</a>
+          <a class="btn primary" href="mailto:dotkboy@outlook.com?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request API Key</a>
         </div>
       </nav>
     </div>
@@ -198,61 +385,136 @@
 
   <main>
     <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="pill">v0.1.0 public release</span>
+          <h1>Compile the truth structure behind dashboards, categories, and workflow states.</h1>
+          <p class="lead">
+            ACBP Truth Compiler API turns declared categories, flags, workflow rules, and dashboard outputs into
+            auditable truth-space artifacts — making hidden state logic visible before it becomes operational risk.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="mailto:dotkboy@outlook.com?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request Early Access</a>
+            <a class="btn" href="openapi.json">Download OpenAPI JSON</a>
+            <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">View GitHub</a>
+          </div>
+
+          <p class="micro">
+            Built for developers, BI teams, data analysts, AI builders, and healthcare operations teams who need explainable state logic.
+          </p>
+        </div>
+
+        <div class="panel">
+          <div class="terminal">
+            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <pre>POST /v1/truth-space/compile
+
+{
+  "truth_space_size": 9,
+  "declared_valid_count": 6,
+  "derived_invalid_count": 3,
+  "truth_density": 0.6667,
+  "artifact": "deterministic_brief.md"
+}</pre>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <strong>9</strong>
+              <span>Truth space</span>
+            </div>
+            <div class="metric">
+              <strong>6</strong>
+              <span>Declared valid</span>
+            </div>
+            <div class="metric">
+              <strong>3</strong>
+              <span>Derived invalid</span>
+            </div>
+            <div class="metric">
+              <strong>0.67</strong>
+              <span>Density</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
       <div class="wrap">
-        <span class="badge">v0.1.0 public API release</span>
-        <h1>Expose the hidden truth structure behind dashboards, categories, and workflow states.</h1>
-        <p class="lead">
-          ACBP Truth Compiler API compiles declared categories, flags, dashboard states,
-          workflow rules, and structured outputs into auditable truth-space artifacts.
+        <h2>What the API does</h2>
+        <p class="section-lead">
+          Most analytics tools visualize results. ACBP Truth Compiler exposes the declared truth structure behind those results.
         </p>
 
-        <div class="cta">
-          <a class="btn primary" href="mailto:YOUR_EMAIL_HERE?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Request Early Access</a>
-          <a class="btn" href="openapi.json">View OpenAPI</a>
-          <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">GitHub Repo</a>
-        </div>
-
-        <div class="grid">
+        <div class="grid3">
           <div class="card">
-            <h3>Truth-space compile</h3>
-            <p>Calculate truth-space size, declared valid states, derived invalid states, and truth density.</p>
+            <span class="tag">Compile</span>
+            <h3>Truth-space artifacts</h3>
+            <p>Calculate possible states, declared valid states, derived invalid states, and truth density from structured categories.</p>
           </div>
+
           <div class="card">
+            <span class="tag">Reduce</span>
             <h3>Feature compactness</h3>
-            <p>Recommend compact categorical feature sets before dashboards, models, and AI agents explode in state-space size.</p>
+            <p>Screen categorical and binned features to avoid uncontrolled state explosion in dashboards, models, and agents.</p>
           </div>
+
           <div class="card">
+            <span class="tag">Validate</span>
             <h3>Dashboard equivalence</h3>
-            <p>Compare Live SQL outputs against compiled-state outputs to detect semantic drift and dashboard inconsistency.</p>
+            <p>Compare Live SQL outputs against compiled-state outputs to detect semantic drift, missing states, and inconsistent logic.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section id="endpoints">
       <div class="wrap">
-        <h2>Core API Endpoints</h2>
-        <div class="grid">
+        <h2>Core endpoints</h2>
+        <p class="section-lead">
+          The API is intentionally small, plugin-ready, and JSON-first for fast integration.
+        </p>
+
+        <div class="grid2">
           <div class="card">
-            <h3>POST /v1/truth-space/compile</h3>
-            <p>Compile declared truth specs and return auditable truth-space metrics.</p>
+            <div class="endpoint">POST /v1/truth-space/compile</div>
+            <h3>Compile declared truth specs</h3>
+            <p>Returns truth-space size, declared valid count, derived invalid count, density, and deterministic brief.</p>
           </div>
+
           <div class="card">
-            <h3>POST /v1/features/compact</h3>
-            <p>Screen column metadata or records and recommend compact truth dimensions.</p>
+            <div class="endpoint">POST /v1/features/compact</div>
+            <h3>Recommend compact feature sets</h3>
+            <p>Identifies useful categorical/binned dimensions while avoiding IDs, timestamps, and raw continuous measures.</p>
           </div>
+
           <div class="card">
-            <h3>POST /v1/dashboard/compare</h3>
-            <p>Compare Live SQL and compiled-state result sets for semantic equivalence.</p>
+            <div class="endpoint">POST /v1/dashboard/compare</div>
+            <h3>Compare dashboard outputs</h3>
+            <p>Checks semantic equivalence between Live SQL result sets and compiled-state result sets.</p>
+          </div>
+
+          <div class="card">
+            <div class="endpoint">GET /v1/clinical-dashboard/spec</div>
+            <h3>Clinical operations spec</h3>
+            <p>Provides a structured example for healthcare operations dashboard governance and state validation.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section>
       <div class="wrap">
-        <h2>Example Payload</h2>
-        <pre>{
+        <h2>Example request</h2>
+        <p class="section-lead">
+          Object and color example: Apple can be red or green, Banana can be yellow or green, Mango can be red or yellow.
+        </p>
+
+        <div class="terminal">
+          <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <pre>{
   "name": "object_color",
   "dimensions": [
     { "name": "TargetClass", "values": ["Apple", "Banana", "Mango"] },
@@ -267,40 +529,82 @@
     { "TargetClass": "Mango", "Color": "Yellow" }
   ]
 }</pre>
+        </div>
       </div>
     </section>
 
-    <section class="section">
+    <section>
       <div class="wrap">
-        <h2>Suggested Pricing</h2>
+        <h2>Use cases</h2>
+        <div class="grid3">
+          <div class="card">
+            <h3>BI and dashboard governance</h3>
+            <ul>
+              <li>Validate dashboard state logic</li>
+              <li>Detect missing categorical combinations</li>
+              <li>Compare Live SQL against compiled outputs</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>AI agent guardrails</h3>
+            <ul>
+              <li>Declare valid structured states</li>
+              <li>Detect invalid state combinations</li>
+              <li>Keep agent outputs inside known truth boundaries</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Healthcare operations</h3>
+            <ul>
+              <li>Validate census and occupancy states</li>
+              <li>Govern clinical dashboard logic</li>
+              <li>Separate operational truth from display logic</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="wrap">
+        <h2>Early access plans</h2>
+        <p class="section-lead">
+          Developer-friendly plans for early adopters, API pilots, and small teams.
+        </p>
+
         <div class="pricing">
           <div class="card">
             <h3>Free</h3>
             <div class="price">$0</div>
             <p>25 compiles/month<br>Max truth space: 10,000</p>
           </div>
-          <div class="card">
+
+          <div class="card highlight">
             <h3>Starter</h3>
-            <div class="price">$9</div>
+            <div class="price">$9 <small>/ month</small></div>
             <p>500 compiles/month<br>Max truth space: 100,000</p>
           </div>
+
           <div class="card">
             <h3>Builder</h3>
-            <div class="price">$29</div>
+            <div class="price">$29 <small>/ month</small></div>
             <p>3,000 compiles/month<br>Max truth space: 1,000,000</p>
           </div>
+
           <div class="card">
             <h3>Pro</h3>
-            <div class="price">$79</div>
+            <div class="price">$79 <small>/ month</small></div>
             <p>15,000 compiles/month<br>Max truth space: 10,000,000</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section>
       <div class="wrap">
-        <div class="card truth">
+        <div class="card guardrail">
           <h2>Guardrails</h2>
           <p>Truth space is not a confusion matrix.</p>
           <p>Declared valid count is not prediction correctness.</p>
@@ -309,12 +613,35 @@
         </div>
       </div>
     </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="card contact">
+          <h2>Request early access</h2>
+          <p class="section-lead">
+            For API keys, integration discussion, marketplace listing, or pilot collaboration, contact the maintainer directly.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="mailto:dotkboy@outlook.com?subject=ACBP%20Truth%20Compiler%20API%20Early%20Access">Email dotkboy@outlook.com</a>
+            <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">GitHub Repository</a>
+            <a class="btn" href="openapi.json">OpenAPI JSON</a>
+          </div>
+
+          <p class="micro">
+            Maintainer contact: dotkboy@outlook.com
+          </p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer>
-    <div class="wrap">
-      ACBP Truth Compiler API — Truth must be declared.
+    <div class="wrap footer-row">
+      <div>ACBP Truth Compiler API — Truth must be declared.</div>
+      <div>Contact: <a href="mailto:dotkboy@outlook.com">dotkboy@outlook.com</a></div>
     </div>
   </footer>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-# Marketplace Listing Draft
+﻿# Marketplace Listing Draft
 
 ## Name
 
@@ -31,7 +31,7 @@ Use it before dashboards, semantic layers, AI agents, or analytics pipelines to 
 - AI agent guardrails for structured truth
 - Healthcare operations dashboard governance
 
-## Suggested Pricing
+## Early Access Plans
 
 Free:
 - 25 compiles per month
@@ -57,3 +57,4 @@ Pro:
 Most analytics tools visualize results.
 
 ACBP Truth Compiler exposes and compiles the truth structure behind those results.
+
