@@ -1,0 +1,48 @@
+{
+  "name": "object_color",
+  "dimensions": [
+    {
+      "name": "TargetClass",
+      "values": [
+        "Apple",
+        "Banana",
+        "Mango"
+      ]
+    },
+    {
+      "name": "Color",
+      "values": [
+        "Red",
+        "Yellow",
+        "Green"
+      ]
+    }
+  ],
+  "declared_truths": [
+    {
+      "TargetClass": "Apple",
+      "Color": "Red"
+    },
+    {
+      "TargetClass": "Apple",
+      "Color": "Green"
+    },
+    {
+      "TargetClass": "Banana",
+      "Color": "Yellow"
+    },
+    {
+      "TargetClass": "Banana",
+      "Color": "Green"
+    },
+    {
+      "TargetClass": "Mango",
+      "Color": "Red"
+    },
+    {
+      "TargetClass": "Mango",
+      "Color": "Yellow"
+    }
+  ],
+  "save_artifact": true
+}

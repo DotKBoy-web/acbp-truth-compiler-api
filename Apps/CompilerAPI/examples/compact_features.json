@@ -1,0 +1,33 @@
+{
+  "target_cardinality": 3,
+  "n_rows": 240,
+  "columns": [
+    {
+      "name": "Case_ID",
+      "type": "id",
+      "unique": 240
+    },
+    {
+      "name": "Actual_Start",
+      "type": "timestamp",
+      "unique": 180
+    },
+    {
+      "name": "Delay_Bucket",
+      "type": "category",
+      "unique": 5
+    },
+    {
+      "name": "ASA_Class",
+      "type": "category",
+      "unique": 5
+    },
+    {
+      "name": "Case_Priority",
+      "type": "category",
+      "unique": 4
+    }
+  ],
+  "max_truth_space": 20000,
+  "save_artifact": true
+}

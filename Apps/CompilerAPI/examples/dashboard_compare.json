@@ -1,0 +1,30 @@
+{
+  "live_sql_result": [
+    {
+      "unit": "A",
+      "live_census": 10,
+      "capacity": 15
+    },
+    {
+      "unit": "B",
+      "live_census": 20,
+      "capacity": 25
+    }
+  ],
+  "cbp_result": [
+    {
+      "unit": "B",
+      "live_census": 20,
+      "capacity": 25
+    },
+    {
+      "unit": "A",
+      "live_census": 10,
+      "capacity": 15
+    }
+  ],
+  "key_cols": [
+    "unit"
+  ],
+  "save_artifact": true
+}

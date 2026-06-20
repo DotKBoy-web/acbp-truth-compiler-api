@@ -1,0 +1,17 @@
+﻿{
+    "acbp_starter_dev":  {
+                             "plan":  "starter",
+                             "monthly_limit":  500,
+                             "max_truth_space":  100000
+                         },
+    "acbp_free_demo":  {
+                           "plan":  "free",
+                           "monthly_limit":  25,
+                           "max_truth_space":  10000
+                       },
+    "acbp_builder_dev":  {
+                             "plan":  "builder",
+                             "monthly_limit":  3000,
+                             "max_truth_space":  1000000
+                         }
+}

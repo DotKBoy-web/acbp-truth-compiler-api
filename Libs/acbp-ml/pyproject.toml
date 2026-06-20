@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acbp-ml"
+version = "0.1.0"
+description = "ACBP ML: machine-learning adjacent tools for the Al-Anazi Categorical-Boolean Paradigm"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Mutaib Al-Anazi" }
+]
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "scikit-learn>=1.4",
+    "acbp-core>=0.1.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

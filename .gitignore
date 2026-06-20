@@ -1,0 +1,22 @@
+﻿.venv/
+Tools/uv-cache/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Python packaging artifacts
+*.egg-info/
+build/
+dist/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# ACBP local exports
+Exports/
+# ACBP Compiler API runtime/customer data
+Apps/CompilerAPI/product_data/
+Apps/CompilerAPI/usage.json
+Apps/CompilerAPI/api_keys.json
+# ACBP runtime/customer artifact data
+Apps/CompilerConsole/product_data/
