@@ -18,6 +18,32 @@ def _truthy(value: str | None) -> bool:
     return str(value or "").strip().lower() in {"1", "true", "yes", "y", "on"}
 
 
+def _inject_internal_api_key(request) -> None:
+    """
+    RapidAPI handles subscriber auth, quota, and billing.
+    After RapidAPI proxy-secret validation succeeds, inject an internal
+    ACBP API key so the existing local API-key dependency can continue working.
+    """
+
+    internal_key = os.getenv("ACBP_RAPIDAPI_INTERNAL_KEY", "acbp_builder_dev").strip()
+
+    headers = list(request.scope.get("headers", []))
+
+    # Remove any external attempt to send X-ACBP-API-Key directly.
+    headers = [
+        (k, v)
+        for (k, v) in headers
+        if k.lower() != b"x-acbp-api-key"
+    ]
+
+    headers.append((b"x-acbp-api-key", internal_key.encode("utf-8")))
+    request.scope["headers"] = headers
+
+    # Starlette may cache request.headers before we inject; reset cache.
+    if hasattr(request, "_headers"):
+        delattr(request, "_headers")
+
+
 def install_marketplace_security(app):
     """
     Production gate for marketplace deployment.
@@ -30,6 +56,7 @@ def install_marketplace_security(app):
       ACBP_REQUIRE_RAPIDAPI=true
       RAPIDAPI_PROXY_SECRET must be set.
       Requests must include matching X-RapidAPI-Proxy-Secret.
+      Then the middleware injects an internal X-ACBP-API-Key.
     """
 
     @app.middleware("http")
@@ -68,5 +95,7 @@ def install_marketplace_security(app):
 
         request.state.rapidapi_user = request.headers.get("X-RapidAPI-User", "")
         request.state.rapidapi_subscription = request.headers.get("X-RapidAPI-Subscription", "")
+
+        _inject_internal_api_key(request)
 
         return await call_next(request)

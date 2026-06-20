@@ -12,3 +12,6 @@
         value: "true"
       - key: RAPIDAPI_PROXY_SECRET
         sync: false
+      - key: ACBP_RAPIDAPI_INTERNAL_KEY
+        value: acbp_builder_dev
+
