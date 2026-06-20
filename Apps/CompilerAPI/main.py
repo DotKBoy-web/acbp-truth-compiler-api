@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from acbp_compiler import ACBPCompilerApiService, ACBPCompilerProductService
@@ -242,13 +242,37 @@ def examples() -> dict[str, Any]:
         },
     }
 
+def _marketplace_account(request: Request, fallback_account: dict[str, Any]) -> dict[str, Any]:
+    account = marketplace_account_from_headers(request.headers)
+
+    if account.get("rapidapi_plan") == "DIRECT":
+        account["product_plan"] = fallback_account.get("plan")
+        account["used_this_month"] = fallback_account.get("used_this_month")
+        account["monthly_limit"] = fallback_account.get("monthly_limit")
+        account["artifact_export_enabled"] = True
+
+    return account
+
+
+def _save_artifact_allowed(request: Request, requested: bool) -> bool:
+    return bool(requested) and artifact_export_allowed(request.headers)
+
+
+def _require_artifact_plan(request: Request) -> None:
+    if not artifact_export_allowed(request.headers):
+        raise HTTPException(
+            status_code=403,
+            detail="Artifact project access and ZIP export require PRO, ULTRA, or MEGA plan.",
+        )
+
 
 @app.post("/v1/truth-space/compile")
 def truth_space_compile(
     payload: dict[str, Any],
+    request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = boolify(payload.get("save_artifact", False))
+    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
 
     result = compiler_api.compile_truth_space(
         payload=payload,
@@ -256,22 +280,17 @@ def truth_space_compile(
     )
 
     enforce_truth_space_limit(result, account)
-
-    result["account"] = {
-        "plan": account.get("plan"),
-        "used_this_month": account.get("used_this_month"),
-        "monthly_limit": account.get("monthly_limit"),
-    }
+    result["account"] = _marketplace_account(request, account)
 
     return result
-
 
 @app.post("/v1/features/compact")
 def features_compact(
     payload: dict[str, Any],
+    request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = boolify(payload.get("save_artifact", False))
+    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
 
     payload = dict(payload)
     payload["max_truth_space"] = min(
@@ -285,111 +304,88 @@ def features_compact(
     )
 
     enforce_truth_space_limit(result, account)
-
-    result["account"] = {
-        "plan": account.get("plan"),
-        "used_this_month": account.get("used_this_month"),
-        "monthly_limit": account.get("monthly_limit"),
-    }
+    result["account"] = _marketplace_account(request, account)
 
     return result
-
 
 @app.post("/v1/dashboard/compare")
 def dashboard_compare(
     payload: dict[str, Any],
+    request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = boolify(payload.get("save_artifact", False))
+    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
 
     result = compiler_api.compare_dashboard(
         payload=payload,
         save_artifact=save_artifact,
     )
 
-    result["account"] = {
-        "plan": account.get("plan"),
-        "used_this_month": account.get("used_this_month"),
-        "monthly_limit": account.get("monthly_limit"),
-    }
+    result["account"] = _marketplace_account(request, account)
 
     return result
-
 
 @app.get("/v1/clinical-dashboard/spec")
 def clinical_dashboard_spec(
+    request: Request,
     save_artifact: bool = False,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
+    save_artifact = _save_artifact_allowed(request, save_artifact)
+
     result = compiler_api.clinical_dashboard_spec(save_artifact=save_artifact)
 
     enforce_truth_space_limit(result, account)
-
-    result["account"] = {
-        "plan": account.get("plan"),
-        "used_this_month": account.get("used_this_month"),
-        "monthly_limit": account.get("monthly_limit"),
-    }
+    result["account"] = _marketplace_account(request, account)
 
     return result
 
-
 @app.get("/v1/projects")
 def projects(
+    request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
+    _require_artifact_plan(request)
+
     return {
         "projects": product_service.list_projects(),
-        "account": {
-            "plan": account.get("plan"),
-            "used_this_month": account.get("used_this_month"),
-            "monthly_limit": account.get("monthly_limit"),
-        },
+        "account": _marketplace_account(request, account),
     }
-
 
 @app.get("/v1/projects/{project_id}")
 def project_detail(
     project_id: str,
+    request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
+    _require_artifact_plan(request)
+
     try:
-        return product_service.get_project(project_id)
+        result = product_service.get_project(project_id)
+        if isinstance(result, dict):
+            result["account"] = _marketplace_account(request, account)
+        return result
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Project not found.") from exc
 
 # --- ACBP cloud marketplace security ---
 try:
     from Apps.CompilerAPI.security import install_marketplace_security
+    from Apps.CompilerAPI.rapidapi_plans import marketplace_account_from_headers, artifact_export_allowed
 except ModuleNotFoundError:
     from security import install_marketplace_security
+    from rapidapi_plans import marketplace_account_from_headers, artifact_export_allowed
 
 install_marketplace_security(app)
 # --- end ACBP cloud marketplace security ---
 
-# --- ACBP public export route ---
-try:
-    from fastapi.responses import FileResponse
-except Exception:
-    FileResponse = None
-
-@app.get("/v1/projects/{project_id}/export")
-def export_project_v1(project_id: str):
-    if FileResponse is None:
-        raise RuntimeError("FileResponse is not available.")
-
-    zip_path = product_service.export_project_zip(project_id)
-    return FileResponse(
-        str(zip_path),
-        media_type="application/zip",
-        filename=f"{project_id}.zip",
-    )
-# --- end ACBP public export route ---
 
 # --- ACBP public and legacy export routes ---
 from fastapi.responses import FileResponse
 
-def _export_project_zip_response(project_id: str):
+def _export_project_zip_response(project_id: str, request: Request):
+    _require_artifact_plan(request)
+
     zip_path = product_service.export_project_zip(project_id)
     return FileResponse(
         str(zip_path),
@@ -398,12 +394,12 @@ def _export_project_zip_response(project_id: str):
     )
 
 @app.get("/v1/projects/{project_id}/export")
-def export_project_v1(project_id: str):
-    return _export_project_zip_response(project_id)
+def export_project_v1(project_id: str, request: Request):
+    return _export_project_zip_response(project_id, request)
 
 @app.get("/api/projects/{project_id}/export")
-def export_project_legacy_api(project_id: str):
-    return _export_project_zip_response(project_id)
+def export_project_legacy_api(project_id: str, request: Request):
+    return _export_project_zip_response(project_id, request)
 # --- end ACBP public and legacy export routes ---
 
 # --- ACBP cloud root route ---
@@ -426,3 +422,4 @@ def cloud_root():
 def favicon():
     return PlainTextResponse("", status_code=204)
 # --- end ACBP cloud root route ---
+
