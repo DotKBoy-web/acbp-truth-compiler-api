@@ -3,7 +3,7 @@ import importlib.util
 import json
 import sys
 
-root = Path(r"D:\ACBP")
+root = Path(__file__).resolve().parents[2]
 main_path = root / "Apps" / "CompilerAPI" / "main.py"
 
 if str(root) not in sys.path:
@@ -23,4 +23,10 @@ out.write_text(
     encoding="utf-8",
 )
 
+docs_out = root / "docs" / "openapi.json"
+if docs_out.parent.exists():
+    docs_out.write_text(out.read_text(encoding="utf-8"), encoding="utf-8")
+
 print(f"Exported {out}")
+if docs_out.exists():
+    print(f"Copied to {docs_out}")
