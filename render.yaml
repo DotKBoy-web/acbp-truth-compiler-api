@@ -1,0 +1,14 @@
+﻿services:
+  - type: web
+    name: acbp-truth-compiler-api
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && pip install -e Libs/acbp-core && pip install -e Libs/acbp-ml && pip install -e Libs/acbp-compiler
+    startCommand: uvicorn Apps.CompilerAPI.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ACBP_ENV
+        value: production
+      - key: ACBP_REQUIRE_RAPIDAPI
+        value: "true"
+      - key: RAPIDAPI_PROXY_SECRET
+        sync: false
