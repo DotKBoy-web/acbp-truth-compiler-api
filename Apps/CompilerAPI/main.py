@@ -366,3 +366,42 @@ except ModuleNotFoundError:
 
 install_marketplace_security(app)
 # --- end ACBP cloud marketplace security ---
+
+# --- ACBP public export route ---
+try:
+    from fastapi.responses import FileResponse
+except Exception:
+    FileResponse = None
+
+@app.get("/v1/projects/{project_id}/export")
+def export_project_v1(project_id: str):
+    if FileResponse is None:
+        raise RuntimeError("FileResponse is not available.")
+
+    zip_path = product_service.export_project_zip(project_id)
+    return FileResponse(
+        str(zip_path),
+        media_type="application/zip",
+        filename=f"{project_id}.zip",
+    )
+# --- end ACBP public export route ---
+
+# --- ACBP public and legacy export routes ---
+from fastapi.responses import FileResponse
+
+def _export_project_zip_response(project_id: str):
+    zip_path = product_service.export_project_zip(project_id)
+    return FileResponse(
+        str(zip_path),
+        media_type="application/zip",
+        filename=f"{project_id}.zip",
+    )
+
+@app.get("/v1/projects/{project_id}/export")
+def export_project_v1(project_id: str):
+    return _export_project_zip_response(project_id)
+
+@app.get("/api/projects/{project_id}/export")
+def export_project_legacy_api(project_id: str):
+    return _export_project_zip_response(project_id)
+# --- end ACBP public and legacy export routes ---
