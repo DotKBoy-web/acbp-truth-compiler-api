@@ -243,23 +243,15 @@ def examples() -> dict[str, Any]:
     }
 
 def _marketplace_account(request: Request, fallback_account: dict[str, Any]) -> dict[str, Any]:
-    account = marketplace_account_from_headers(request.headers)
-
-    if account.get("rapidapi_plan") == "DIRECT":
-        account["product_plan"] = fallback_account.get("plan")
-        account["used_this_month"] = fallback_account.get("used_this_month")
-        account["monthly_limit"] = fallback_account.get("monthly_limit")
-        account["artifact_export_enabled"] = True
-
-    return account
+    return marketplace_account_from_request(request, fallback_account)
 
 
 def _save_artifact_allowed(request: Request, requested: bool) -> bool:
-    return bool(requested) and artifact_export_allowed(request.headers)
+    return bool(requested) and artifact_export_allowed(request)
 
 
 def _require_artifact_plan(request: Request) -> None:
-    if not artifact_export_allowed(request.headers):
+    if not artifact_export_allowed(request):
         raise HTTPException(
             status_code=403,
             detail="Artifact project access and ZIP export require PRO, ULTRA, or MEGA plan.",
@@ -272,7 +264,10 @@ def truth_space_compile(
     request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
+    save_artifact = _save_artifact_allowed(
+        request,
+        boolify(payload.get("save_artifact", False)),
+    )
 
     result = compiler_api.compile_truth_space(
         payload=payload,
@@ -290,7 +285,10 @@ def features_compact(
     request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
+    save_artifact = _save_artifact_allowed(
+        request,
+        boolify(payload.get("save_artifact", False)),
+    )
 
     payload = dict(payload)
     payload["max_truth_space"] = min(
@@ -314,7 +312,10 @@ def dashboard_compare(
     request: Request,
     account: dict[str, Any] = Depends(require_api_key),
 ) -> dict[str, Any]:
-    save_artifact = _save_artifact_allowed(request, boolify(payload.get("save_artifact", False)))
+    save_artifact = _save_artifact_allowed(
+        request,
+        boolify(payload.get("save_artifact", False)),
+    )
 
     result = compiler_api.compare_dashboard(
         payload=payload,
@@ -371,10 +372,10 @@ def project_detail(
 # --- ACBP cloud marketplace security ---
 try:
     from Apps.CompilerAPI.security import install_marketplace_security
-    from Apps.CompilerAPI.rapidapi_plans import marketplace_account_from_headers, artifact_export_allowed
+    from Apps.CompilerAPI.rapidapi_plans import marketplace_account_from_request, artifact_export_allowed
 except ModuleNotFoundError:
     from security import install_marketplace_security
-    from rapidapi_plans import marketplace_account_from_headers, artifact_export_allowed
+    from rapidapi_plans import marketplace_account_from_request, artifact_export_allowed
 
 install_marketplace_security(app)
 # --- end ACBP cloud marketplace security ---
@@ -394,11 +395,19 @@ def _export_project_zip_response(project_id: str, request: Request):
     )
 
 @app.get("/v1/projects/{project_id}/export")
-def export_project_v1(project_id: str, request: Request):
+def export_project_v1(
+    project_id: str,
+    request: Request,
+    account: dict[str, Any] = Depends(require_api_key),
+):
     return _export_project_zip_response(project_id, request)
 
 @app.get("/api/projects/{project_id}/export")
-def export_project_legacy_api(project_id: str, request: Request):
+def export_project_legacy_api(
+    project_id: str,
+    request: Request,
+    account: dict[str, Any] = Depends(require_api_key),
+):
     return _export_project_zip_response(project_id, request)
 # --- end ACBP public and legacy export routes ---
 

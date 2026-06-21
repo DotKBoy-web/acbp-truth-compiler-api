@@ -24,33 +24,63 @@ RAPIDAPI_PLAN_MAP: dict[str, dict[str, Any]] = {
         "monthly_limit": 15000,
         "artifact_export_enabled": True,
     },
-    "CUSTOM": {
-        "product_plan": "custom",
-        "monthly_limit": None,
-        "artifact_export_enabled": True,
-    },
 }
 
 
-def marketplace_account_from_headers(headers) -> dict[str, Any]:
-    rapidapi_plan = (
-        headers.get("x-rapidapi-subscription")
-        or headers.get("X-RapidAPI-Subscription")
-        or "DIRECT"
-    ).upper()
+def _header(headers: Any, name: str) -> str | None:
+    return headers.get(name) or headers.get(name.lower()) or headers.get(name.upper())
 
-    rapidapi_user = (
-        headers.get("x-rapidapi-user")
-        or headers.get("X-RapidAPI-User")
-        or None
+
+def _rapidapi_subscription_from_request(request: Any) -> str:
+    state = getattr(request, "state", None)
+
+    plan = (
+        getattr(state, "rapidapi_subscription", None)
+        or _header(request.headers, "X-RapidAPI-Subscription")
+        or _header(request.headers, "x-rapidapi-subscription")
+        or "DIRECT"
     )
+
+    return str(plan).upper()
+
+
+def _rapidapi_user_from_request(request: Any) -> str | None:
+    state = getattr(request, "state", None)
+
+    user = (
+        getattr(state, "rapidapi_user", None)
+        or _header(request.headers, "X-RapidAPI-User")
+        or _header(request.headers, "x-rapidapi-user")
+    )
+
+    return str(user) if user else None
+
+
+def marketplace_account_from_request(
+    request: Any,
+    fallback_account: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    fallback_account = fallback_account or {}
+
+    rapidapi_plan = _rapidapi_subscription_from_request(request)
+    rapidapi_user = _rapidapi_user_from_request(request)
+
+    if rapidapi_plan == "DIRECT":
+        return {
+            "rapidapi_plan": "DIRECT",
+            "rapidapi_user": rapidapi_user,
+            "product_plan": fallback_account.get("plan", "direct"),
+            "used_this_month": fallback_account.get("used_this_month"),
+            "monthly_limit": fallback_account.get("monthly_limit"),
+            "artifact_export_enabled": True,
+        }
 
     plan = RAPIDAPI_PLAN_MAP.get(
         rapidapi_plan,
         {
-            "product_plan": "direct",
+            "product_plan": "unknown",
             "monthly_limit": None,
-            "artifact_export_enabled": True,
+            "artifact_export_enabled": False,
         },
     )
 
@@ -64,5 +94,5 @@ def marketplace_account_from_headers(headers) -> dict[str, Any]:
     }
 
 
-def artifact_export_allowed(headers) -> bool:
-    return bool(marketplace_account_from_headers(headers)["artifact_export_enabled"])
+def artifact_export_allowed(request: Any) -> bool:
+    return bool(marketplace_account_from_request(request)["artifact_export_enabled"])
