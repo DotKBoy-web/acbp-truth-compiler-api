@@ -3,518 +3,710 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ACBP Truth Compiler API | Declared-Truth Modeling for Dashboards and Workflow States</title>
-  <meta name="description" content="ACBP Truth Compiler API compiles categories, dashboard states, workflow logic, and declared truths into auditable truth-space artifacts." />
-
+  <title>ACBP Truth Compiler API | Declare Truth Before Dashboards Lie</title>
+  <meta name="description" content="Compile declared truth-space models for dashboards, categorical states, workflow logic, and AI guardrails." />
   <style>
     :root {
-      --bg: #07101f;
-      --bg2: #0b1220;
-      --panel: rgba(255,255,255,.055);
-      --panel2: rgba(255,255,255,.035);
-      --text: #eef5ff;
-      --muted: #a9b7cc;
-      --soft: #d7e7ff;
-      --line: rgba(255,255,255,.12);
-      --accent: #61dafb;
-      --accent2: #9dffca;
-      --gold: #ffcf70;
-      --danger: #ff8a8a;
-      --shadow: 0 24px 80px rgba(0,0,0,.35);
+      --bg: #050713;
+      --panel: rgba(255,255,255,.075);
+      --panel2: rgba(255,255,255,.11);
+      --text: #f5f7ff;
+      --muted: #aeb7d9;
+      --line: rgba(255,255,255,.16);
+      --cyan: #39d9ff;
+      --violet: #8b5cff;
+      --pink: #ff4fd8;
+      --green: #6dffb8;
+      --gold: #ffd86b;
+      --danger: #ff6b8a;
+      --shadow: 0 30px 90px rgba(0,0,0,.45);
     }
 
     * { box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
-
     body {
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at 15% 5%, rgba(97,218,251,.22), transparent 30%),
-        radial-gradient(circle at 85% 0%, rgba(157,255,202,.14), transparent 28%),
-        linear-gradient(180deg, #050a14 0%, var(--bg) 45%, #050a14 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
-      line-height: 1.6;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(57,217,255,.25), transparent 26rem),
+        radial-gradient(circle at 80% 10%, rgba(139,92,255,.28), transparent 30rem),
+        radial-gradient(circle at 50% 80%, rgba(255,79,216,.14), transparent 32rem),
+        var(--bg);
+      overflow-x: hidden;
     }
 
-    a { color: inherit; text-decoration: none; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+      z-index: 0;
+    }
+
+    .orb {
+      position: fixed;
+      width: 34rem;
+      height: 34rem;
+      border-radius: 999px;
+      filter: blur(70px);
+      opacity: .36;
+      pointer-events: none;
+      animation: float 11s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    .orb.one { background: var(--cyan); left: -14rem; top: 12rem; }
+    .orb.two { background: var(--violet); right: -15rem; top: 4rem; animation-delay: -3s; }
+    .orb.three { background: var(--pink); left: 40%; bottom: -17rem; animation-delay: -6s; }
+
+    @keyframes float {
+      from { transform: translate3d(0,0,0) scale(1); }
+      to { transform: translate3d(2rem,-2rem,0) scale(1.08); }
+    }
 
     .wrap {
-      width: min(1160px, calc(100% - 42px));
+      width: min(1180px, calc(100% - 36px));
       margin: 0 auto;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(18px);
-      background: rgba(5,10,20,.76);
-      border-bottom: 1px solid var(--line);
+      position: relative;
+      z-index: 1;
     }
 
     nav {
-      min-height: 76px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(22px);
+      background: rgba(5,7,19,.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 18px;
+      align-items: center;
+      padding: 14px 0;
+      gap: 20px;
     }
-
     .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand strong {
-      font-size: 17px;
-      letter-spacing: .2px;
-    }
-
-    .brand span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .navlinks {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
+      font-weight: 900;
+      letter-spacing: -.03em;
     }
-
-    .pill {
-      display: inline-flex;
+    .logo {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--violet), var(--pink));
+      box-shadow: 0 0 30px rgba(57,217,255,.35);
+      font-weight: 1000;
+    }
+    .nav-links {
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border: 1px solid rgba(97,218,251,.35);
-      border-radius: 999px;
-      color: var(--accent);
-      background: rgba(97,218,251,.08);
-      font-size: 13px;
-      font-weight: 700;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 14px;
     }
+    .nav-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .nav-links a:hover { color: white; }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-radius: 13px;
+      gap: 10px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
+      border-radius: 999px;
+      padding: 12px 18px;
+      color: white;
+      text-decoration: none;
       font-weight: 800;
-      transition: .18s ease;
-      white-space: nowrap;
+      background: rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      transition: .25s ease;
+      cursor: pointer;
     }
-
     .btn:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.1);
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.13);
     }
-
     .btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #041018;
-      border: none;
-      box-shadow: 0 12px 40px rgba(97,218,251,.18);
+      border: 0;
+      background: linear-gradient(135deg, var(--cyan), var(--violet), var(--pink));
+      box-shadow: 0 18px 60px rgba(139,92,255,.35);
     }
+    .btn.ghost { box-shadow: none; }
 
     .hero {
-      padding: 96px 0 72px;
-    }
-
-    .hero-grid {
+      padding: 88px 0 44px;
       display: grid;
-      grid-template-columns: 1.18fr .82fr;
-      gap: 34px;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 42px;
       align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 12px;
+      border: 1px solid rgba(109,255,184,.25);
+      border-radius: 999px;
+      background: rgba(109,255,184,.08);
+      color: #dfffee;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(109,255,184,.6);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 12px rgba(109,255,184,0); }
+      100% { box-shadow: 0 0 0 0 rgba(109,255,184,0); }
     }
 
     h1 {
-      font-size: clamp(42px, 6vw, 76px);
-      line-height: .98;
-      letter-spacing: -2.8px;
-      margin: 18px 0 20px;
-      max-width: 900px;
+      margin: 0;
+      font-size: clamp(44px, 7vw, 86px);
+      line-height: .92;
+      letter-spacing: -.08em;
     }
-
+    .gradient-text {
+      background: linear-gradient(90deg, #fff, var(--cyan), var(--pink), #fff);
+      background-size: 220%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shine 5s ease-in-out infinite;
+    }
+    @keyframes shine {
+      0%,100% { background-position: 0%; }
+      50% { background-position: 100%; }
+    }
     .lead {
-      max-width: 760px;
       color: var(--muted);
-      font-size: 20px;
-      margin: 0 0 30px;
+      font-size: 19px;
+      line-height: 1.7;
+      margin: 24px 0 28px;
+      max-width: 720px;
     }
-
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
-      margin: 32px 0 26px;
+      margin-bottom: 26px;
     }
-
-    .micro {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      padding: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .terminal {
-      background: #040813;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 20px;
-      padding: 18px;
-      overflow: hidden;
-    }
-
-    .dots {
+    .mini-proof {
       display: flex;
-      gap: 7px;
-      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .mini-proof span {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      padding: 8px 11px;
+      border-radius: 999px;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.25);
+    .terminal-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.13);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(3deg);
+      animation: cardFloat 6s ease-in-out infinite alternate;
     }
-
+    @keyframes cardFloat {
+      to { transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) translateY(-8px); }
+    }
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0,0,0,.2);
+    }
+    .dots { display: flex; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 999px; background: var(--danger); }
+    .dot:nth-child(2) { background: var(--gold); }
+    .dot:nth-child(3) { background: var(--green); }
     pre {
       margin: 0;
-      color: #dff8ff;
+      padding: 24px;
+      color: #dbe8ff;
+      overflow: auto;
+      line-height: 1.55;
       font-size: 13px;
-      white-space: pre-wrap;
-      word-break: break-word;
+    }
+    code .key { color: var(--cyan); }
+    code .num { color: var(--gold); }
+    code .good { color: var(--green); }
+    code .bad { color: var(--pink); }
+
+    section { padding: 72px 0; }
+    .section-title {
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1;
+      letter-spacing: -.06em;
+      margin: 0 0 14px;
+    }
+    .section-sub {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 17px;
+      max-width: 780px;
+      margin: 0 0 30px;
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-top: 22px;
+      gap: 16px;
+      margin-top: 34px;
     }
-
     .metric {
-      padding: 16px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.045);
-      border-radius: 18px;
+      background: var(--panel);
+      padding: 22px;
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
     }
-
     .metric strong {
       display: block;
-      font-size: 22px;
-      color: var(--soft);
+      font-size: 34px;
+      letter-spacing: -.04em;
     }
+    .metric span { color: var(--muted); font-size: 13px; }
 
-    .metric span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    section {
-      padding: 58px 0;
-    }
-
-    h2 {
-      font-size: clamp(30px, 4.3vw, 48px);
-      letter-spacing: -1.5px;
-      line-height: 1.05;
-      margin: 0 0 14px;
-    }
-
-    .section-lead {
-      color: var(--muted);
-      max-width: 760px;
-      font-size: 18px;
-      margin: 0 0 28px;
-    }
-
-    .grid3 {
+    .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
     }
-
-    .grid2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
     .card {
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
       border: 1px solid var(--line);
-      border-radius: 24px;
+      background: var(--panel);
+      border-radius: 26px;
       padding: 24px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+      transition: .25s ease;
+      position: relative;
+      overflow: hidden;
     }
-
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(57,217,255,.22), transparent 35%, rgba(255,79,216,.18));
+      opacity: 0;
+      transition: .25s ease;
+      pointer-events: none;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      background: var(--panel2);
+      border-color: rgba(255,255,255,.28);
+    }
+    .card:hover::before { opacity: 1; }
+    .card > * { position: relative; z-index: 1; }
+    .icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(57,217,255,.2), rgba(139,92,255,.2));
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
     .card h3 {
       margin: 0 0 10px;
-      font-size: 19px;
+      letter-spacing: -.03em;
+      font-size: 21px;
     }
-
-    .card p, .card li {
+    .card p {
+      margin: 0;
       color: var(--muted);
+      line-height: 1.65;
     }
 
-    .card ul {
-      margin: 12px 0 0;
-      padding-left: 20px;
+    .demo {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 20px;
+      align-items: stretch;
     }
-
-    .tag {
-      display: inline-flex;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(157,255,202,.09);
-      color: var(--accent2);
-      border: 1px solid rgba(157,255,202,.22);
+    .demo-controls label {
+      display: block;
+      color: var(--muted);
+      margin: 16px 0 8px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      color: white;
+      padding: 12px 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 210px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 14px;
+      line-height: 1.5;
     }
-
-    .endpoint {
-      color: var(--accent);
-      font-family: Consolas, monospace;
-      font-size: 14px;
-      font-weight: 800;
+    .result-box {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
     }
+    .result-pill {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(0,0,0,.22);
+    }
+    .result-pill b {
+      display: block;
+      font-size: 26px;
+      color: white;
+    }
+    .result-pill small { color: var(--muted); }
 
     .pricing {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
     }
-
+    .price-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      border-radius: 26px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .price-card.recommended {
+      border-color: rgba(57,217,255,.55);
+      box-shadow: 0 0 80px rgba(57,217,255,.14);
+    }
+    .tag {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      color: white;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .price-card h3 { margin: 0 0 8px; font-size: 22px; }
     .price {
-      font-size: 34px;
-      font-weight: 950;
-      margin: 6px 0 8px;
-      letter-spacing: -1px;
+      font-size: 38px;
+      letter-spacing: -.05em;
+      font-weight: 1000;
+      margin: 12px 0;
     }
-
-    .price small {
-      font-size: 14px;
+    .price small { font-size: 13px; color: var(--muted); font-weight: 700; }
+    .price-card ul {
+      padding: 0;
+      list-style: none;
+      margin: 18px 0 0;
       color: var(--muted);
-      font-weight: 700;
+      line-height: 1.9;
+      font-size: 14px;
+    }
+    .price-card li::before {
+      content: "✓ ";
+      color: var(--green);
+      font-weight: 900;
     }
 
-    .highlight {
-      border-color: rgba(97,218,251,.45);
-      background: linear-gradient(180deg, rgba(97,218,251,.09), rgba(255,255,255,.035));
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .tab.active {
+      color: white;
+      background: linear-gradient(135deg, rgba(57,217,255,.28), rgba(139,92,255,.28));
+      border-color: rgba(255,255,255,.35);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .copy-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px 20px 0 0;
+      padding: 12px 14px;
+      background: rgba(0,0,0,.28);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .copy-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      color: white;
+      border-radius: 999px;
+      padding: 7px 11px;
+      cursor: pointer;
+      font-weight: 800;
     }
 
-    .guardrail {
-      border-left: 5px solid var(--gold);
-    }
-
-    .contact {
+    .final-cta {
+      text-align: center;
+      padding: 90px 24px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
       background:
-        radial-gradient(circle at top right, rgba(97,218,251,.13), transparent 30%),
-        linear-gradient(180deg, var(--panel), var(--panel2));
+        linear-gradient(135deg, rgba(57,217,255,.18), rgba(139,92,255,.15), rgba(255,79,216,.14)),
+        rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+    }
+    .final-cta h2 {
+      margin: 0;
+      font-size: clamp(36px, 6vw, 70px);
+      line-height: .95;
+      letter-spacing: -.07em;
+    }
+    .final-cta p {
+      max-width: 740px;
+      margin: 18px auto 28px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 18px;
     }
 
     footer {
-      padding: 38px 0 58px;
       color: var(--muted);
       border-top: 1px solid var(--line);
-      margin-top: 30px;
+      padding: 30px 0;
+      margin-top: 70px;
+      font-size: 14px;
+    }
+    footer a { color: white; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: .7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .footer-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
+    @media (max-width: 920px) {
+      .hero, .demo { grid-template-columns: 1fr; }
+      .terminal-card { transform: none; }
+      .metrics, .pricing { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
     }
-
-    @media (max-width: 940px) {
-      .hero-grid, .grid3, .grid2, .pricing, .metrics {
-        grid-template-columns: 1fr;
-      }
-
-      nav {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 16px 0;
-      }
-
-      .hero {
-        padding-top: 60px;
-      }
+    @media (max-width: 560px) {
+      .metrics, .pricing, .result-box { grid-template-columns: 1fr; }
+      .hero { padding-top: 56px; }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="wrap">
-      <nav>
-        <a class="brand" href="#">
-          <strong>ACBP Truth Compiler API</strong>
-          <span>Declared-truth modeling for structured systems</span>
-        </a>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
 
-        <div class="navlinks">
-          <a class="btn" href="#endpoints">Endpoints</a>
-          <a class="btn" href="#pricing">Pricing</a>
-          <a class="btn" href="openapi.json">OpenAPI</a>
-          <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe on RapidAPI</a>
-        </div>
-      </nav>
+  <nav>
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo">A</div>
+        <span>ACBP Truth Compiler</span>
+      </div>
+      <div class="nav-links">
+        <a href="#why">Why</a>
+        <a href="#demo">Demo</a>
+        <a href="#api">API</a>
+        <a href="#pricing">Pricing</a>
+        <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe</a>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <main>
+  <main class="wrap">
     <section class="hero">
-      <div class="wrap hero-grid">
-        <div>
-          <span class="pill">v0.1.0 public release</span>
-          <h1>Compile the truth structure behind dashboards, categories, and workflow states.</h1>
-          <p class="lead">
-            ACBP Truth Compiler API turns declared categories, flags, workflow rules, and dashboard outputs into
-            auditable truth-space artifacts — making hidden state logic visible before it becomes operational risk.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe on RapidAPI</a>
-            <a class="btn" href="openapi.json">Download OpenAPI JSON</a>
-            <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">View GitHub</a>
-          </div>
-
-          <p class="micro">
-            Built for developers, BI teams, data analysts, AI builders, and healthcare operations teams who need explainable state logic.
-          </p>
+      <div>
+        <div class="badge"><span class="pulse"></span> Live on RapidAPI • Powered by ACBP</div>
+        <h1>Declare truth before dashboards <span class="gradient-text">lie.</span></h1>
+        <p class="lead">
+          ACBP Truth Compiler API exposes the hidden truth-space behind categorical data, dashboards,
+          workflow states, and AI guardrails. Stop guessing what your system allows. Compile it.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe on RapidAPI →</a>
+          <a class="btn ghost" href="#demo">Run the interactive demo</a>
         </div>
-
-        <div class="panel">
-          <div class="terminal">
-            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-            <pre>POST /v1/truth-space/compile
-
-{
-  "truth_space_size": 9,
-  "declared_valid_count": 6,
-  "derived_invalid_count": 3,
-  "truth_density": 0.6667,
-  "artifact": "deterministic_brief.md"
-}</pre>
-          </div>
-
-          <div class="metrics">
-            <div class="metric">
-              <strong>9</strong>
-              <span>Truth space</span>
-            </div>
-            <div class="metric">
-              <strong>6</strong>
-              <span>Declared valid</span>
-            </div>
-            <div class="metric">
-              <strong>3</strong>
-              <span>Derived invalid</span>
-            </div>
-            <div class="metric">
-              <strong>0.67</strong>
-              <span>Density</span>
-            </div>
-          </div>
+        <div class="mini-proof">
+          <span>Truth-space compiler</span>
+          <span>Dashboard governance</span>
+          <span>Workflow-state validation</span>
+          <span>AI guardrail support</span>
         </div>
       </div>
-    </section>
 
-    <section>
-      <div class="wrap">
-        <h2>What the API does</h2>
-        <p class="section-lead">
-          Most analytics tools visualize results. ACBP Truth Compiler exposes the declared truth structure behind those results.
-        </p>
-
-        <div class="grid3">
-          <div class="card">
-            <span class="tag">Compile</span>
-            <h3>Truth-space artifacts</h3>
-            <p>Calculate possible states, declared valid states, derived invalid states, and truth density from structured categories.</p>
-          </div>
-
-          <div class="card">
-            <span class="tag">Reduce</span>
-            <h3>Feature compactness</h3>
-            <p>Screen categorical and binned features to avoid uncontrolled state explosion in dashboards, models, and agents.</p>
-          </div>
-
-          <div class="card">
-            <span class="tag">Validate</span>
-            <h3>Dashboard equivalence</h3>
-            <p>Compare Live SQL outputs against compiled-state outputs to detect semantic drift, missing states, and inconsistent logic.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="endpoints">
-      <div class="wrap">
-        <h2>Core endpoints</h2>
-        <p class="section-lead">
-          The API is intentionally small, plugin-ready, and JSON-first for fast integration.
-        </p>
-
-        <div class="grid2">
-          <div class="card">
-            <div class="endpoint">POST /v1/truth-space/compile</div>
-            <h3>Compile declared truth specs</h3>
-            <p>Returns truth-space size, declared valid count, derived invalid count, density, and deterministic brief.</p>
-          </div>
-
-          <div class="card">
-            <div class="endpoint">POST /v1/features/compact</div>
-            <h3>Recommend compact feature sets</h3>
-            <p>Identifies useful categorical/binned dimensions while avoiding IDs, timestamps, and raw continuous measures.</p>
-          </div>
-
-          <div class="card">
-            <div class="endpoint">POST /v1/dashboard/compare</div>
-            <h3>Compare dashboard outputs</h3>
-            <p>Checks semantic equivalence between Live SQL result sets and compiled-state result sets.</p>
-          </div>
-
-          <div class="card">
-            <div class="endpoint">GET /v1/clinical-dashboard/spec</div>
-            <h3>Clinical operations spec</h3>
-            <p>Provides a structured example for healthcare operations dashboard governance and state validation.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
-        <h2>Example request</h2>
-        <p class="section-lead">
-          Object and color example: Apple can be red or green, Banana can be yellow or green, Mango can be red or yellow.
-        </p>
-
-        <div class="terminal">
+      <div class="terminal-card">
+        <div class="terminal-top">
           <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <pre>{
+          <span style="color:var(--muted);font-size:13px;font-weight:800;">POST /v1/truth-space/compile</span>
+        </div>
+        <pre><code>{
+  "<span class="key">truth_space_size</span>": <span class="num">9</span>,
+  "<span class="key">declared_valid_count</span>": <span class="good">6</span>,
+  "<span class="key">derived_invalid_count</span>": <span class="bad">3</span>,
+  "<span class="key">truth_density</span>": <span class="num">0.666667</span>,
+  "<span class="key">guardrails</span>": [
+    "Truth space is not a confusion matrix.",
+    "Declared valid count is not prediction correctness.",
+    "Derived invalid count is not model error."
+  ]
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="metrics">
+        <div class="metric"><strong data-count="9">0</strong><span>truth-space states</span></div>
+        <div class="metric"><strong data-count="6">0</strong><span>declared valid states</span></div>
+        <div class="metric"><strong data-count="3">0</strong><span>derived invalid states</span></div>
+        <div class="metric"><strong data-count="667">0</strong><span>truth density ×1000</span></div>
+      </div>
+    </section>
+
+    <section id="why" class="reveal">
+      <h2 class="section-title">Most dashboards show outputs. ACBP shows the truth structure.</h2>
+      <p class="section-sub">
+        Your dashboard can look clean while its categorical logic is incomplete. ACBP makes valid and invalid states explicit
+        before BI users, AI agents, or operations teams depend on the result.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="icon">🧠</div>
+          <h3>Declared truth modeling</h3>
+          <p>Represent what is valid, what is invalid, and what was never declared under closed-world assumptions.</p>
+        </div>
+        <div class="card">
+          <div class="icon">📊</div>
+          <h3>Dashboard logic governance</h3>
+          <p>Compare live SQL results with compiled-state outputs to detect semantic drift and dashboard inconsistency.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🛡️</div>
+          <h3>AI guardrail support</h3>
+          <p>Validate categorical states before AI agents consume operational data or trigger automated decisions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="reveal">
+      <h2 class="section-title">Interactive truth-space demo</h2>
+      <p class="section-sub">
+        This front-end demo mirrors the core idea: TargetClass × Color gives 9 possible states.
+        Six are declared valid. Three become derived invalid.
+      </p>
+
+      <div class="demo">
+        <div class="card demo-controls">
+          <h3>Object-color declared truths</h3>
+          <label>Target classes</label>
+          <input id="classes" value="Apple, Banana, Mango" />
+
+          <label>Color values</label>
+          <input id="colors" value="Red, Yellow, Green" />
+
+          <label>Declared valid truths</label>
+          <textarea id="truths">Apple|Red
+Apple|Green
+Banana|Yellow
+Banana|Green
+Mango|Red
+Mango|Yellow</textarea>
+
+          <div style="margin-top:16px;">
+            <button class="btn primary" onclick="compileDemo()">Compile demo truth-space</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Compiler output</h3>
+          <div class="result-box">
+            <div class="result-pill"><b id="space">9</b><small>truth-space size</small></div>
+            <div class="result-pill"><b id="valid">6</b><small>declared valid</small></div>
+            <div class="result-pill"><b id="invalid">3</b><small>derived invalid</small></div>
+            <div class="result-pill"><b id="density">0.667</b><small>truth density</small></div>
+          </div>
+          <p id="invalidList" style="color:var(--muted);line-height:1.7;margin-top:20px;">
+            Derived invalid: Apple|Yellow, Banana|Red, Mango|Green
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="api" class="reveal">
+      <h2 class="section-title">API endpoints built for builders.</h2>
+      <p class="section-sub">Use the compiler before dashboards, semantic layers, analytics pipelines, and AI agents.</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('compile')">Truth compile</button>
+        <button class="tab" onclick="showTab('compact')">Compact features</button>
+        <button class="tab" onclick="showTab('compare')">Dashboard compare</button>
+      </div>
+
+      <div id="compile" class="tab-panel active">
+        <div class="copy-row"><span>POST /v1/truth-space/compile</span><button class="copy-btn" onclick="copyBlock('compileCode')">Copy</button></div>
+        <pre id="compileCode"><code>{
   "name": "object_color",
   "dimensions": [
     { "name": "TargetClass", "values": ["Apple", "Banana", "Mango"] },
@@ -527,121 +719,173 @@
     { "TargetClass": "Banana", "Color": "Green" },
     { "TargetClass": "Mango", "Color": "Red" },
     { "TargetClass": "Mango", "Color": "Yellow" }
-  ]
-}</pre>
+  ],
+  "save_artifact": false
+}</code></pre>
+      </div>
+
+      <div id="compact" class="tab-panel">
+        <div class="copy-row"><span>POST /v1/features/compact</span><button class="copy-btn" onclick="copyBlock('compactCode')">Copy</button></div>
+        <pre id="compactCode"><code>{
+  "target_cardinality": 3,
+  "n_rows": 240,
+  "columns": [
+    { "name": "Case_ID", "type": "id", "unique": 240 },
+    { "name": "Delay_Bucket", "type": "category", "unique": 5 },
+    { "name": "ASA_Class", "type": "category", "unique": 5 }
+  ],
+  "max_truth_space": 20000
+}</code></pre>
+      </div>
+
+      <div id="compare" class="tab-panel">
+        <div class="copy-row"><span>POST /v1/dashboard/compare</span><button class="copy-btn" onclick="copyBlock('compareCode')">Copy</button></div>
+        <pre id="compareCode"><code>{
+  "live_sql_result": [
+    { "unit": "A", "live_census": 10 }
+  ],
+  "cbp_result": [
+    { "unit": "A", "live_census": 10 }
+  ],
+  "key_cols": ["unit"]
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="pricing" class="reveal">
+      <h2 class="section-title">Start free. Upgrade when truth becomes infrastructure.</h2>
+      <p class="section-sub">Plans are available through RapidAPI. PRO is recommended for real integration testing and artifact export.</p>
+
+      <div class="pricing">
+        <div class="price-card">
+          <h3>BASIC</h3>
+          <div class="price">$0 <small>/mo</small></div>
+          <ul>
+            <li>Free testing</li>
+            <li>25 requests/month</li>
+            <li>Compile truth spaces</li>
+            <li>Examples and health checks</li>
+          </ul>
+        </div>
+        <div class="price-card recommended">
+          <div class="tag">Recommended</div>
+          <h3>PRO</h3>
+          <div class="price">$9 <small>/mo</small></div>
+          <ul>
+            <li>500 requests/month</li>
+            <li>Artifact export</li>
+            <li>Project access</li>
+            <li>Starter integrations</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <h3>ULTRA</h3>
+          <div class="price">$29 <small>/mo</small></div>
+          <ul>
+            <li>3,000 requests/month</li>
+            <li>Builder workload</li>
+            <li>Team prototyping</li>
+            <li>Higher usage limits</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <h3>MEGA</h3>
+          <div class="price">$79 <small>/mo</small></div>
+          <ul>
+            <li>15,000 requests/month</li>
+            <li>Production-style usage</li>
+            <li>Heavy dashboard workflows</li>
+            <li>Highest quota</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <section>
-      <div class="wrap">
-        <h2>Use cases</h2>
-        <div class="grid3">
-          <div class="card">
-            <h3>BI and dashboard governance</h3>
-            <ul>
-              <li>Validate dashboard state logic</li>
-              <li>Detect missing categorical combinations</li>
-              <li>Compare Live SQL against compiled outputs</li>
-            </ul>
-          </div>
-
-          <div class="card">
-            <h3>AI agent guardrails</h3>
-            <ul>
-              <li>Declare valid structured states</li>
-              <li>Detect invalid state combinations</li>
-              <li>Keep agent outputs inside known truth boundaries</li>
-            </ul>
-          </div>
-
-          <div class="card">
-            <h3>Healthcare operations</h3>
-            <ul>
-              <li>Validate census and occupancy states</li>
-              <li>Govern clinical dashboard logic</li>
-              <li>Separate operational truth from display logic</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing">
-      <div class="wrap">
-        <h2>Early access plans</h2>
-        <p class="section-lead">
-          Developer-friendly plans for early adopters, API pilots, and small teams.
+    <section class="reveal">
+      <div class="final-cta">
+        <h2>Truth must be declared.</h2>
+        <p>
+          Build dashboards, AI systems, and operational workflows on declared logic instead of accidental data states.
+          Start with the free BASIC plan or go PRO for artifact export.
         </p>
-
-        <div class="pricing">
-          <div class="card">
-            <h3>Free</h3>
-            <div class="price">$0</div>
-            <p>25 compiles/month<br>Max truth space: 10,000</p>
-          </div>
-
-          <div class="card highlight">
-            <h3>Starter</h3>
-            <div class="price">$9 <small>/ month</small></div>
-            <p>500 compiles/month<br>Max truth space: 100,000</p>
-          </div>
-
-          <div class="card">
-            <h3>Builder</h3>
-            <div class="price">$29 <small>/ month</small></div>
-            <p>3,000 compiles/month<br>Max truth space: 1,000,000</p>
-          </div>
-
-          <div class="card">
-            <h3>Pro</h3>
-            <div class="price">$79 <small>/ month</small></div>
-            <p>15,000 compiles/month<br>Max truth space: 10,000,000</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
-        <div class="card guardrail">
-          <h2>Guardrails</h2>
-          <p>Truth space is not a confusion matrix.</p>
-          <p>Declared valid count is not prediction correctness.</p>
-          <p>Derived invalid count is not model error.</p>
-          <p>ACBP is for declared-truth modeling, dashboard logic validation, categorical-state reasoning, and operational state validation.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact">
-      <div class="wrap">
-        <div class="card contact">
-          <h2>Request early access</h2>
-          <p class="section-lead">
-            For API keys, integration discussion, marketplace listing, or pilot collaboration, contact the maintainer directly.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe on RapidAPI</a>
-            <a class="btn" href="https://github.com/DotKBoy-web/acbp-truth-compiler-api">GitHub Repository</a>
-            <a class="btn" href="openapi.json">OpenAPI JSON</a>
-          </div>
-
-          <p class="micro">
-            Maintainer contact: dotkboy@outlook.com
-          </p>
-        </div>
+        <a class="btn primary" href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">Subscribe on RapidAPI →</a>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="wrap footer-row">
-      <div>ACBP Truth Compiler API — Truth must be declared.</div>
-      <div>Contact: <a href="mailto:dotkboy@outlook.com">dotkboy@outlook.com</a></div>
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <span>© 2026 ACBP Truth Compiler API. Al-Anazi Categorical-Boolean Paradigm.</span>
+        <span><a href="https://rapidapi.com/DotKBoyweb/api/acbp-truth-compiler-api">RapidAPI</a> · <a href="mailto:dotkboy@outlook.com">Contact</a></span>
+      </div>
     </div>
   </footer>
+
+  <script>
+    function parseCsv(value) {
+      return value.split(",").map(x => x.trim()).filter(Boolean);
+    }
+
+    function compileDemo() {
+      const classes = parseCsv(document.getElementById("classes").value);
+      const colors = parseCsv(document.getElementById("colors").value);
+      const declared = document.getElementById("truths").value
+        .split(/\r?\n/)
+        .map(x => x.trim())
+        .filter(Boolean);
+
+      const declaredSet = new Set(declared);
+      const all = [];
+      classes.forEach(c => colors.forEach(color => all.push(`${c}|${color}`)));
+
+      const invalid = all.filter(x => !declaredSet.has(x));
+      const density = declaredSet.size / all.length;
+
+      document.getElementById("space").textContent = all.length;
+      document.getElementById("valid").textContent = declaredSet.size;
+      document.getElementById("invalid").textContent = invalid.length;
+      document.getElementById("density").textContent = density.toFixed(3);
+      document.getElementById("invalidList").textContent = "Derived invalid: " + invalid.join(", ");
+    }
+
+    function showTab(id) {
+      document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(x => x.classList.remove("active"));
+      event.target.classList.add("active");
+      document.getElementById(id).classList.add("active");
+    }
+
+    function copyBlock(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      event.target.textContent = "Copied";
+      setTimeout(() => event.target.textContent = "Copy", 1200);
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          entry.target.querySelectorAll("[data-count]").forEach(el => {
+            const target = Number(el.dataset.count);
+            let start = 0;
+            const step = Math.max(1, Math.ceil(target / 36));
+            const timer = setInterval(() => {
+              start += step;
+              if (start >= target) {
+                start = target;
+                clearInterval(timer);
+              }
+              el.textContent = start;
+            }, 28);
+          });
+        }
+      });
+    }, { threshold: .18 });
+
+    document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+    compileDemo();
+  </script>
 </body>
 </html>
-
